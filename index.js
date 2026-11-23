@@ -25,6 +25,7 @@ const mongoClient = await connectToMongoDB()
 
 const db = mongoClient.db('booknook')
 const bookCollection = db.collection('books')
+const BorrowCollection = db.collection('BorrowBooks')
 
 
 //add books api
@@ -57,6 +58,13 @@ app.get('/newbooks', async (req, res) => {
 
     res.send(result);
 });
+
+//borrow api
+app.post('/borrow', async (req, res) => {
+    const data = req.body
+    const result = await BorrowCollection.insertOne(data)
+    res.send(result)
+})
 
 // http://localhost:8000/book
 app.get('/', (req, res) => {

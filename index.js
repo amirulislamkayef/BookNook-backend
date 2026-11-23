@@ -26,6 +26,7 @@ const mongoClient = await connectToMongoDB()
 const db = mongoClient.db('booknook')
 const bookCollection = db.collection('books')
 
+
 //add books api
 app.post('/add-book', async (req, res) => {
     const data = req.body
@@ -42,11 +43,22 @@ app.get('/books', async (req, res) => {
 //details page api
 app.get('/book/:id', async (req, res) => {
     const { id } = req.params
-    const result = await bookCollection.findOne({ id: ObjectId(_id) })
+    const result = await bookCollection.findOne({ _id: new ObjectId(id) })
     res.send(result)
 })
 
-// http://localhost:8000/books
+//new arrivals books
+app.get('/newbooks', async (req, res) => {
+    const result = await bookCollection
+        .find()
+        .sort({ _id: -1 })
+        .limit(10)
+        .toArray();
+
+    res.send(result);
+});
+
+// http://localhost:8000/book
 app.get('/', (req, res) => {
     res.send('Hello World!')
 })

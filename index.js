@@ -66,7 +66,22 @@ app.post('/borrow', async (req, res) => {
     res.send(result)
 })
 
-// http://localhost:8000/book
+//get borrow 
+app.get('/my-borrows/:email', async (req, res) => {
+    const { email } = req.params
+    const result = await BorrowCollection.find({ email: email }).toArray()
+    res.send(result)
+})
+
+//get my books
+app.get("/my-books/:email", async (req, res) => {
+    const email = req.params.email;
+    const query = { userEmail: email };
+    const result = await bookCollection.find(query).toArray();
+    res.send(result);
+});
+
+// http://localhost:8000/my-books/
 app.get('/', (req, res) => {
     res.send('Hello World!')
 })

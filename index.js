@@ -123,6 +123,51 @@ app.get("/my-books/:email", async (req, res) => {
     res.send(result);
 });
 
+// Return Book API
+app.delete('/return/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { email } = req.body;
+
+        const borrow = await BorrowCollection.findOne({
+            _id: id,
+            email: email
+        });
+
+        if (!borrow) {
+            return res.status(404).send({
+                message: "Borrow record not found"
+            });
+        }
+        const updateBook = await bookCollection.updateOne(
+            { _id: borrow.bookId },
+            { $inc: { totalCopies: 1 } }
+        );
+
+        if (updateBook.matchedCount === 0) {
+            return res.status(404).send({
+                message: "Book not found"
+            });
+        }
+        const deleteBorrow = await BorrowCollection.deleteOne({
+            _id: id,
+            email: email
+        });
+
+        res.send({
+            success: true,
+            message: "Book returned successfully"
+        });
+
+    } catch (error) {
+        console.log("Return Error:", error);
+
+        res.status(500).send({
+            message: error.message
+        });
+    }
+});
+
 // http://localhost:8000/my-books/
 app.get('/', (req, res) => {
     res.send('Hello World!')

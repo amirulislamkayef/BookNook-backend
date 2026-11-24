@@ -3,6 +3,7 @@ import { MongoClient } from 'mongodb';
 import 'dotenv/config'
 import cors from 'cors'
 import { ObjectId } from 'mongodb';
+import { jwtVerify, createRemoteJWKSet } from 'jose';
 
 const app = express()
 const port = 8000
@@ -64,7 +65,7 @@ app.get('/books', async (req, res) => {
 })
 
 //details page api
-app.get('/book/:id', async (req, res) => {
+app.get('/book/:id',verifyToken, async (req, res) => {
     const { id } = req.params
     const result = await bookCollection.findOne({ _id: new ObjectId(id) })
     res.send(result)
@@ -220,3 +221,4 @@ app.get('/', (req, res) => {
 app.listen(port, () => {
     console.log(`server is running onn port ${port}`)
 })
+export default app

@@ -27,6 +27,29 @@ const db = mongoClient.db('booknook')
 const bookCollection = db.collection('books')
 const BorrowCollection = db.collection('BorrowBooks')
 
+//middleware
+const verifyToken = async (req, res, next) => {
+    const authHeader = req.headers.authorization;
+    if (!authHeader) {
+        return res.status(401).send({ msg: "Unauthorized!" });
+    }
+    const token = authHeader.split(" ")[1];
+    if (!token) {
+        return res.status(401).send({ msg: "Unauthorized!" });
+    }
+
+    const JWKS = createRemoteJWKSet(
+        new URL(`${process.env.CLIENT_URL}/api/auth/jwks`),
+    );
+
+    try {
+        const { payload } = await jwtVerify(token, JWKS);
+        next();
+    } catch (error) {
+        return res.status(500).send({ msg: "Server Error!" });
+    }
+};
+
 
 //add books api
 app.post('/add-book', async (req, res) => {
@@ -174,6 +197,19 @@ app.delete('/delete-book/:id', async (req, res) => {
     const result = await bookCollection.deleteOne({
         _id: new ObjectId(id)
     });
+    res.send(result);
+});
+
+//edit book api
+app.patch('/update-book/:id', async (req, res) => {
+    const { id } = req.params;
+    const data = req.body;
+    const result = await bookCollection.updateOne(
+        { _id: new ObjectId(id) },
+        {
+            $set: data
+        }
+    );
     res.send(result);
 });
 

@@ -50,7 +50,6 @@ const verifyToken = async (req, res, next) => {
     }
 };
 
-
 //add books api
 app.post('/add-book', async (req, res) => {
     const data = req.body

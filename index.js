@@ -168,6 +168,15 @@ app.delete('/return/:id', async (req, res) => {
     }
 });
 
+//delete book api
+app.delete('/delete-book/:id', async (req, res) => {
+    const { id } = req.params;
+    const result = await bookCollection.deleteOne({
+        _id: new ObjectId(id)
+    });
+    res.send(result);
+});
+
 // http://localhost:8000/my-books/
 app.get('/', (req, res) => {
     res.send('Hello World!')
